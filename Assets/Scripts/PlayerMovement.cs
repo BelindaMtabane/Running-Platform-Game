@@ -1,63 +1,109 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // Import the UI namespace to use UI elements
+using UnityEngine.SceneManagement; // Import the SceneManagement namespace to manage scenes
+using System.Collections;
+using TMPro; // Import the Collections namespace for IEnumerator
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement: MonoBehaviour
 {
-    //Declare Variables
-    public float playerSpeed = 4.0f;//This is a variable that determines the velocity for the player
-    public float playerMovement = 5.0f;//Track the player movements
-    public float rightMaximum = 4.02f;
-    public float leftMaximum = -4.02f;
-    public float jumpingForce = 10.0f;//This is a variable that determines the force of the jump
-    private Rigidbody rigid;//This will be attached to the Player to allow gravity to interact on the Player's physics
-    private bool IsGrounded = true;
+    bool isAlive = true; // This is a flag to check if the player is alive
+    [SerializeField] float speed = 5f; // This is the speed of the player
+    [SerializeField] Rigidbody rigidbody; // Reference to the Rigidbody component
 
-    void Start()
+    private int points = 0; // This is the score of the player
+    private int health = 100; // This is the health of the player
+    [SerializeField] int maxHealth = 100; // This is the maximum health of the player
+    private int shield = 0; // This is the shield of the player
+    [SerializeField] int maxShield = 100; // This is the maximum shield of the player
+    private int timeOrb = 0; // This is the time orb of the player
+    [SerializeField] int maxTimeOrb = 10; // This is the maximum time orb of the player
+
+    float horizontalInput;
+    [SerializeField] float horizontalSpeedMultiplier = 1.5f; // Multiplier for horizontal speed
+
+    [SerializeField] TextMeshProUGUI scoreText;
+    [SerializeField] TextMeshProUGUI healthText;
+    [SerializeField] TextMeshProUGUI shieldText;
+
+    private void FixedUpdate()
     {
-        rigid = GetComponent<Rigidbody>();//This will control the PLayer's position in the game
+        if (!isAlive) return; // If the player is not alive, do not move
+
+        Vector3 forwardMovement = transform.forward * speed * Time.fixedDeltaTime;
+        Vector3 horizontalMovement = transform.right * horizontalInput * speed * Time.fixedDeltaTime * horizontalSpeedMultiplier;
+        rigidbody.MovePosition(rigidbody.position + forwardMovement + horizontalMovement);
     }
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        //Move the Player's position using transform in a certain direction, using the vector
-        transform.Translate(Vector3.forward * Time.deltaTime * playerSpeed, Space.World);
+        horizontalInput = Input.GetAxis("Horizontal");
 
-        //Create an if statement to check if the keys or arrow keys are pressed to move the Player in the x axis
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        if (transform.position.y < -5) // Check if the player falls below a certain height
         {
-            //Create another if stament to track the movement of the player does not go over the platform
-            if (this.gameObject.transform.position.x > leftMaximum)
-            {
-                //Move the Player left
-                transform.Translate(Vector3.left * Time.deltaTime * playerMovement);
-            }
+            KillPlayer(); // Call the KillPlayer method
         }
-        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        
+        // Quite the game if the Escape key is pressed
+        if (Input.GetKeyDown(KeyCode.Escape)) // Check if the Escape key is pressed
         {
-            //Create another if stament to track the movement of the player does not go over the platform
-            if (this.gameObject.transform.position.x < rightMaximum)
-            {
-                //Move the Player right
-                transform.Translate(Vector3.right * Time.deltaTime * playerMovement);
-            }
-        }
-        else if (Input.GetKey(KeyCode.Space) && IsGrounded)
-        {
-            // Add force to make the player jump
-            rigid.AddForce(Vector3.up * jumpingForce, ForceMode.Impulse);
-            IsGrounded = false; // Set isGrounded to false when the player jumps
-            //rigid.useGravity = true;
+            Application.Quit(); // Quit the application
         }
     }
 
-    // Detect collisions and check if the player is grounded
-    private void OnCollisionEnter(Collision collision)
+
+    public void KillPlayer()
     {
-        if (collision.gameObject.CompareTag("Ground")) // Check if the player is colliding with the ground
+        // This is method is currently not being used, it will be used when the player collides with a certain object
+        isAlive = false; // Set the player to not alive
+        // Restart the Game
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Reload the current scene
+    }
+
+    public void AddPoints(int pointsToAdd)
+    {
+        points += pointsToAdd; // Add points to the player's score
+    }
+
+    public void AddHealth(int healthToAdd)
+    {
+        health += healthToAdd; // Add health to the player's health
+        if (health > maxHealth) // Ensure health does not exceed maxHealth
         {
-            IsGrounded = true; //Reset when touching any surface
-            //rigid.useGravity = false; // Re-enable gravity to make the player not fall when not jumping
+            health = maxHealth;
         }
+    }
+
+    public void AddShield(int shieldToAdd)
+    {
+        shield += shieldToAdd; // Add shield to the player's shield
+        if (shield > maxShield) // Ensure shield does not exceed maxShield
+        {
+            shield = maxShield;
+        }
+    }
+
+    public void AddTimeOrb(int timeOrbToAdd)
+    {
+        timeOrb += timeOrbToAdd; // Add time orb to the player's time orb
+        if (timeOrb > maxTimeOrb) // Ensure timeOrb does not exceed maxTimeOrb
+        {
+            timeOrb = maxTimeOrb;
+        }
+        StartCoroutine(SlowDownPlayer(timeOrbToAdd)); // Trigger the slowdown effect
+    }
+
+    private IEnumerator SlowDownPlayer(int duration)
+    {
+        float originalSpeed = speed; // Store the original speed
+        speed = 2f; // Reduce the player's speed
+        yield return new WaitForSeconds(duration); // Wait for the specified duration
+        speed = originalSpeed; // Revert to the original speed
+    }
+
+
+    public void UpdateUI()
+    {
+        scoreText.text = "Score: " + points; // Update the score text
+        healthText.text = "Health: " + health; // Update the health text
+        shieldText.text = "Shield: " + shield; // Update the shield text
     }
 }
