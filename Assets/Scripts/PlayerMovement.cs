@@ -8,7 +8,7 @@ public class PlayerMovement: MonoBehaviour
 {
     bool isAlive = true; // This is a flag to check if the player is alive
     [SerializeField] float speed = 5f; // This is the speed of the player
-    [SerializeField] Rigidbody rigidbody; // Reference to the Rigidbody component
+    [SerializeField] public new Rigidbody rigidbody; // Reference to the Rigidbody component
 
     private int points = 0; // This is the score of the player
     private int health = 100; // This is the health of the player
@@ -24,6 +24,13 @@ public class PlayerMovement: MonoBehaviour
     [SerializeField] TextMeshProUGUI scoreText;
     [SerializeField] TextMeshProUGUI healthText;
     [SerializeField] TextMeshProUGUI shieldText;
+
+    public float jumpingForce = 3.0f;//This is a variable that determines the force of the jump
+
+    void Start()
+    {
+        rigidbody = GetComponent<Rigidbody>();//This will control the PLayer's position in the game
+    }
 
     private void FixedUpdate()
     {
@@ -47,8 +54,12 @@ public class PlayerMovement: MonoBehaviour
         {
             Application.Quit(); // Quit the application
         }
+        if (Input.GetKey(KeyCode.Space))
+        {
+            // Add force to make the player jump
+            rigidbody.AddForce(Vector3.up * jumpingForce, ForceMode.Impulse);
+        }
     }
-
 
     public void KillPlayer()
     {
