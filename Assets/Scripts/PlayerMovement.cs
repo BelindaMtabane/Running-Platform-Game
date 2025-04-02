@@ -6,12 +6,12 @@ using TMPro; // Import the Collections namespace for IEnumerator
 
 public class PlayerMovement: MonoBehaviour
 {
-    bool isAlive = true; // This is a flag to check if the player is alive
+    public bool isAlive = true; // This is a flag to check if the player is alive
     [SerializeField] float speed = 5f; // This is the speed of the player
     [SerializeField] public new Rigidbody rigidbody; // Reference to the Rigidbody component
 
-    private int points = 0; // This is the score of the player
-    private int health = 100; // This is the health of the player
+    public int points = 0; // This is the score of the player
+    public int health = 10; // This is the health of the player
     [SerializeField] int maxHealth = 100; // This is the maximum health of the player
     private int shield = 0; // This is the shield of the player
     [SerializeField] int maxShield = 100; // This is the maximum shield of the player
@@ -22,10 +22,15 @@ public class PlayerMovement: MonoBehaviour
     [SerializeField] float horizontalSpeedMultiplier = 1.5f; // Multiplier for horizontal speed
 
     [SerializeField] TextMeshProUGUI scoreText;
+    [SerializeField] TextMeshProUGUI deathScore;
     [SerializeField] TextMeshProUGUI healthText;
     [SerializeField] TextMeshProUGUI shieldText;
 
-    public float jumpingForce = 3.0f;//This is a variable that determines the force of the jump
+    public float jumpVelocity = 0.21f;//This is a variable that determines the force of the jump
+    public float downVelocity = -0.21f;//This is a variable that determines the force of the downward movement
+    public float jumpMax = 2.1f; // Height at which downward force is applied
+    public float delayForce = 0.21f; // Delay before downward force is applied
+    private float airTime; // Time when jump occurred
 
     void Start()
     {
@@ -40,7 +45,7 @@ public class PlayerMovement: MonoBehaviour
         Vector3 horizontalMovement = transform.right * horizontalInput * speed * Time.fixedDeltaTime * horizontalSpeedMultiplier;
         rigidbody.MovePosition(rigidbody.position + forwardMovement + horizontalMovement);
     }
-    private void Update()
+    void Update()
     {
         horizontalInput = Input.GetAxis("Horizontal");
 
@@ -48,16 +53,26 @@ public class PlayerMovement: MonoBehaviour
         {
             KillPlayer(); // Call the KillPlayer method
         }
-        
+
         // Quite the game if the Escape key is pressed
-        if (Input.GetKeyDown(KeyCode.Escape)) // Check if the Escape key is pressed
+        if (Input.GetKeyDown(KeyCode.Escape)) // Check if the Escape key is presse-d
         {
             Application.Quit(); // Quit the application
         }
-        if (Input.GetKey(KeyCode.Space))
+        else if (Input.GetKey(KeyCode.Space))
         {
             // Add force to make the player jump
-            rigidbody.AddForce(Vector3.up * jumpingForce, ForceMode.Impulse);
+            rigidbody.AddForce(new Vector3(0, jumpVelocity, 0), ForceMode.Impulse);
+            airTime = Time.time; // Record the time when the jump occurred
+        }
+        if (transform.position.y >= jumpMax)
+        {
+            if (Time.time - airTime >= delayForce)
+            {
+                // Apply downward force after a delay
+                rigidbody.AddForce(new Vector3(0, downVelocity, 0), ForceMode.Impulse);
+            }
+
         }
     }
 
@@ -113,6 +128,7 @@ public class PlayerMovement: MonoBehaviour
 
     public void UpdateUI()
     {
+        deathScore.text = "Score: " + points; // Update the death score text
         scoreText.text = "Score: " + points; // Update the score text
         healthText.text = "Health: " + health; // Update the health text
         shieldText.text = "Shield: " + shield; // Update the shield text

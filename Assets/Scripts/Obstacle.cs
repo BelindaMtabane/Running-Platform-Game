@@ -1,22 +1,34 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Obstacle : MonoBehaviour
 {
-    PlayerMovement playerMovement; // Reference to the PlayerMovement script
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] GameObject thePlayer;//Associate with the player
+    PlayerMovement playerMovement;// Call the Player movement class
+    [SerializeField] GameObject deathMenu; // Reference to the Death Menu (assigned in the Inspector)
+    private Rigidbody playerRigid;//This will be attached to the Player to allow gravity to interact on the Player's physics
+
     void Start()
     {
-        playerMovement = GameObject.FindAnyObjectByType<PlayerMovement>(); // Find the PlayerMovement script in the scene   
+        playerRigid = thePlayer.GetComponent<Rigidbody>();//This will control the Player's position in the game
+        deathMenu.SetActive(false);// This will make the death menu disappear
     }
-
-    private void OnTriggerEnter(Collider other)
+    void OnCollisionEnter(Collision collision)
     {
-        //TODO: This method will be used to kill the player, not being used at the moment
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        // Log the name of the object the player is colliding with
+        Debug.Log("Collision detected with: " + collision.gameObject.name);
         
+        // Check if the the death menu is null to make it active or create a debug message
+        if (deathMenu != null)
+        {
+            // Update the Death Menu score
+            Time.timeScale = 0; // Freezes game
+            deathMenu.SetActive(true); // This makes the death menu appear
+        }
+        else
+        {
+            Debug.LogError("Death Menu is not assigned!");// This will display an error message
+        }
     }
 }
