@@ -5,6 +5,7 @@ public class GroundTile : MonoBehaviour
     GroundSpawner groundSpawner; // Reference to the GroundSpawner script
     
     [SerializeField] GameObject obstaclePrefab; // Prefab for the obstacle
+    //[SerializeField] private Obstacle obstacleScript; // Assign this in the Inspector
     Vector3 obstaclePositions; // Position to spawn the obstacle
     [SerializeField] GameObject coinPrefab; // Prefab for the coin, {HealthCoin, SheinCoin, SpeedUpCoin, PointsCoin}
 
@@ -31,7 +32,12 @@ public class GroundTile : MonoBehaviour
     {
         int randomSpawnIndex = Random.Range(2, 5); // Randomly select a spawn index for the obstacle
         Transform spawnPoint = transform.GetChild(randomSpawnIndex).transform; // Get the spawn point from the child of the ground tile
-        Instantiate(obstaclePrefab, spawnPoint.position, Quaternion.identity, transform); // Instantiate the obstacle prefab at the spawn point
+        // Randomly choose an ObstacleType from the enum
+        //Obstacle.ObstacleTypes randomObstacleType = (Obstacle.ObstacleTypes)Random.Range(0, System.Enum.GetValues(typeof(Obstacle.ObstacleTypes)).Length);
+
+        // Instantiate the prefab directly using the selected ObstacleType
+        //GameObject obstaclePrefab = obstacleScript.obstacleTypes[(int)randomObstacleType];
+        GameObject obstaclePrefabs = Instantiate(obstaclePrefab, spawnPoint.position, Quaternion.identity, transform); // Instantiate the obstacle prefab at the spawn point
         obstaclePositions = spawnPoint.position; // Set the obstacle position to the spawn point position
     }
 
