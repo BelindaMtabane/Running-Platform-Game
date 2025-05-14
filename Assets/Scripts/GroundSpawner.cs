@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class GroundSpawner : MonoBehaviour
@@ -41,7 +42,7 @@ public class GroundSpawner : MonoBehaviour
         }
     }*/
 
-    [SerializeField] GameObject groundTilePrefab; // Prefab for the ground tile
+    /*[SerializeField] GameObject groundTilePrefab; // Prefab for the ground tile
     Vector3 nextSpawnPosition; // Position to spawn the next ground tile
 
     public void SpawnTile()
@@ -52,9 +53,35 @@ public class GroundSpawner : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        for (int i = 0; i < 10; i++) // Spawn 10 ground tiles
+        for (int i = 0; i < 5; i++) // Spawn 5 ground tiles
         {
             SpawnTile();
         }
+    }*/
+    public GameObject segmentMap01;
+    public GameObject segmentMap02;
+    public GameObject segmentMap03;
+    public GameObject segmentMap04;
+    public GameObject segmentMap05;
+    public GameObject segmentMap06;
+
+    void Start()
+    {
+        StartCoroutine(SpawnTile());
+    }
+    IEnumerator SpawnTile()
+    {
+        yield return new WaitForSeconds(1);
+        segmentMap01.SetActive(true);
+        yield return new WaitForSeconds(2);
+        segmentMap02.SetActive(true);
+        yield return new WaitForSeconds(2);
+        segmentMap03.SetActive(true);
+        yield return new WaitForSeconds(1);
+        segmentMap04.SetActive(true);
+        yield return new WaitForSeconds(1);
+        segmentMap05.SetActive(true);
+        yield return new WaitForSeconds(1);
+        segmentMap06.SetActive(false);
     }
 }

@@ -15,10 +15,13 @@ public class Obstacle : MonoBehaviour
     //public EvilHands evilHands; // Reference to the EvilHands script
     //private WoodenSpike woodenSpike; // Reference to the WoodenSpike script
     //private PortalGateWay portalGateWay; // Reference to the PortalGateWay script
+
+
     void Start()
     {
+        //deathMenu.SetActive(false);// This will make the death menu disappear
         playerRigid = thePlayer.GetComponent<Rigidbody>();//This will control the Player's position in the game
-        deathMenu.SetActive(false);// This will make the death menu disappear
+        //deathMenu.SetActive(false);// This will make the death menu disappear
     }
     /*public enum ObstacleTypes
     {
@@ -35,7 +38,8 @@ public class Obstacle : MonoBehaviour
         // Log the name of the object the player is colliding with
         Debug.Log("Collision detected with: " + collision.gameObject.name);
         // Check if the player collides with the Spike or EvilHands
-        if (collision.gameObject.CompareTag("Player"))
+
+        if (collision.gameObject == thePlayer)
         {
             // Check if the the death menu is null to make it active or create a debug message
             if (deathMenu != null)

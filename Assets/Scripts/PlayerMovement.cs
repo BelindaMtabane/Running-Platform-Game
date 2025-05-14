@@ -7,7 +7,7 @@ using TMPro; // Import the Collections namespace for IEnumerator
 public class PlayerMovement: MonoBehaviour
 {
     public bool isAlive = true; // This is a flag to check if the player is alive
-    [SerializeField] float speed = 5f; // This is the speed of the player
+    [SerializeField] float speed = 10f; // This is the speed of the player
     [SerializeField] public new Rigidbody rigidbody; // Reference to the Rigidbody component
 
     public int points = 0; // This is the score of the player
@@ -157,7 +157,7 @@ public class PlayerMovement: MonoBehaviour
         StartCoroutine(SlowDownPlayer(timeOrbToAdd)); // Trigger the slowdown effect
     }
 
-    private IEnumerator SlowDownPlayer(int duration)
+    public IEnumerator SlowDownPlayer(int duration)
     {
         float originalSpeed = speed; // Store the original speed
         speed = 2f; // Reduce the player's speed
@@ -171,6 +171,6 @@ public class PlayerMovement: MonoBehaviour
         deathScore.text = "Score: " + points; // Update the death score text
         scoreText.text = "Score: " + points; // Update the score text
         healthText.text = "Health: " + health; // Update the health text
-        shieldText.text = "Shield: " + shield; // Update the shield text
+        shieldText.text = "Coal: " + shield; // Update the shield text
     }
 }
