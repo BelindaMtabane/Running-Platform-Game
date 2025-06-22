@@ -59,8 +59,8 @@ Transform:
   m_GameObject: {fileID: 1679264398347904330}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 4.4}
+  m_LocalScale: {x: 5, y: 1, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5826434196612717793}
@@ -103,8 +103,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a4fb106ae076461c8cabaefc81fd620, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
   obstaclePrefab: {fileID: 5278501258699618783, guid: 98f21e6afeddb9c419f792799a1735b2, type: 3}
-  coinPrefab: {fileID: 859435479035443892, guid: 92644c253719c84419b63b3020d180aa, type: 3}
+  pickupPrefab: []
+  healthPrefab: {fileID: 679864369103879499, guid: d5ea63aebdd80e344b6f16392f9e8ff2, type: 3}
+  coalPrefab: {fileID: 5253018711512930328, guid: 98661d6de3db092499f6583ebb927388, type: 3}
+  pointsPrefab: {fileID: 8588061054967466627, guid: 0090b9ae4a7af4240a6a10006bb68a30, type: 3}
+  timeorbPrefab: {fileID: 8864624805005668522, guid: 63eda24f45af450459aae3c84c0f2f7c, type: 3}
+  HandPrefab: {fileID: 3028707841961710335, guid: f93822bd62864704986e1bed88778bc7, type: 3}
+  SpikePrefab: {fileID: 2050246223141412456, guid: 54ea2cfc4747913468b6a9bda4791d6b, type: 3}
+  portalPrefab: {fileID: 7266159987501351007, guid: 0e1d24f7b09983c49ac4b54b37c802c9, type: 3}
+  enemyPrefab: {fileID: 2733376936247041499, guid: 8a132e04b30f6c04b878e73ea107a840, type: 3}
+  tileIndex: 0
 --- !u!23 &5715079136757570704
 MeshRenderer:
   m_ObjectHideFlags: 0

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 5524300521840120565}
   - component: {fileID: 7889013138997446054}
   - component: {fileID: 7814189350435650065}
-  - component: {fileID: 3326868110216601789}
   - component: {fileID: 1204845526046485606}
   m_Layer: 0
   m_Name: PickUpCoin
@@ -112,24 +111,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &3326868110216601789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 859435479035443892}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 632b82133ee634bab8b01635ae007375, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  increasePoints: 10
-  increaseHealth: 10
-  increaseShield: 10
-  slowDownTimeForSeconds: 5
-  pickUpType: 0
-  turnSpeed: 90
 --- !u!54 &1204845526046485606
 Rigidbody:
   m_ObjectHideFlags: 0

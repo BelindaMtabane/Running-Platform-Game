@@ -4,29 +4,38 @@ using UnityEngine.SceneManagement; // Import the SceneManagement namespace to ma
 using System.Collections;
 using TMPro; // Import the Collections namespace for IEnumerator
 
-public class PlayerMovement: MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
+    public static PlayerMovement Instance; // Singleton instance of PlayerMovement
     public bool isAlive = true; // This is a flag to check if the player is alive
-    [SerializeField] float speed = 5f; // This is the speed of the player
-    [SerializeField] public new Rigidbody rigidbody; // Reference to the Rigidbody component
+    [SerializeField] public float speed = 9f; // This is the speed of the player
+    public new Rigidbody rigidbody; // Reference to the Rigidbody component
+
+    [SerializeField] int maxTimeOrb = 10; // This is the maximum time orb of the player
+    [SerializeField] TMP_Text scoreText;
+    [SerializeField] TMP_Text deathScore;
+    [SerializeField] TMP_Text healthText;
+    [SerializeField] TMP_Text coalText;
+    [SerializeField] private TMP_Text clockText; // Assign this in the Inspector
+    float elapsedTime = 0f; // This is the elapsed time since the game started
 
     public int points = 0; // This is the score of the player
-    public int health = 10; // This is the health of the player
+    public int health = 50000; // This is the health of the player
     [SerializeField] int maxHealth = 100; // This is the maximum health of the player
-    private int shield = 0; // This is the shield of the player
-    [SerializeField] int maxShield = 100; // This is the maximum shield of the player
+    public int coal = 0; // This is the coal of the player
+
+    [SerializeField] int maxCoal = 100; // This is the maximum coal of the player
     private int timeOrb = 0; // This is the time orb of the player
-    [SerializeField] int maxTimeOrb = 10; // This is the maximum time orb of the player
+    [SerializeField] private Obstacle obstacle;// Reference to the Obstacle script
 
     float horizontalInput;
     [SerializeField] float horizontalSpeedMultiplier = 1.5f; // Multiplier for horizontal speed
 
-    [SerializeField] TextMeshProUGUI countdownText; // Reference to a TextMeshProUGUI element to display the countdown
-    [SerializeField] TextMeshProUGUI scoreText;
-    [SerializeField] TextMeshProUGUI deathScore;
-    [SerializeField] TextMeshProUGUI healthText;
-    [SerializeField] TextMeshProUGUI shieldText;
-   
+    // Add these fields to set X axis movement limits
+    [SerializeField] private float minX = -8.90f;
+    [SerializeField] private float maxX = 8.75f;
+
+    [SerializeField] private TMP_Text countdownText; // Reference to a TextMeshProUGUI element to display the countdown
 
     public float jumpVelocity = 0.21f;//This is a variable that determines the force of the jump
     public float downVelocity = -0.21f;//This is a variable that determines the force of the downward movement
@@ -35,13 +44,19 @@ public class PlayerMovement: MonoBehaviour
     private float airTime; // Time when jump occurred
 
     [SerializeField] private float countdownTimer = 3f; // Countdown time in seconds
-   
-    private bool isPlayerMoving = false; // Flag to track if the player is moving
 
+    private bool isPlayerMoving = false; // Flag to track if the player is moving
+    private float healthDrainTimer = 0f;
+    /// <summary>
+    /// /Updated upstream
+    /// </summary>
+    // GameObject deathMenu;
+
+    [SerializeField] GameObject deathMenu;
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();//This will control the PLayer's position in the game
-        
+        obstacle = GetComponent<Obstacle>();// This will control the Obstacle's position in the game
     }
     public void StartCountdown()
     {
@@ -51,8 +66,15 @@ public class PlayerMovement: MonoBehaviour
     }
     public void StartMovement()
     {
-        //isPlayerMoving = true; // Set to true for player to move
-        countdownText.gameObject.SetActive(false); // Hide the countdown text
+        countdownText.text = "Starting in: " + countdownTimer.ToString(); // Show initial countdown
+        // Call the method to start moving Player
+        StartMovement();// Start moving
+    }
+    public void StopMovement()
+    {
+        isPlayerMoving = false;
+        rigidbody.linearVelocity = Vector3.zero;
+        rigidbody.angularVelocity = Vector3.zero;
     }
     public void FixedUpdate()
     {
@@ -73,9 +95,31 @@ public class PlayerMovement: MonoBehaviour
         }
         if (isPlayerMoving)
         {
+            // Health drain logic
+            healthDrainTimer += Time.fixedDeltaTime;
+            // Check if the health drain timer has reached 1 second
+            if (healthDrainTimer >= 1f)
+            {
+                health -= 1;// This is the health drain per second
+                healthDrainTimer = 0f;// Reset the timer
+                if (health < 0) health = 0;// Ensure health does not go below 0
+                UpdateUI();// Update the UI with the new health value
+                if (health <= 0)
+                {
+                    Time.timeScale = 0; // Freezes game
+                    // Call the KillPlayer method to handle player death
+                    obstacle.EnableMenu();
+                    return;
+                }
+            }
             Vector3 forwardMovement = transform.forward * speed * Time.fixedDeltaTime;
             Vector3 horizontalMovement = transform.right * horizontalInput * speed * Time.fixedDeltaTime * horizontalSpeedMultiplier;
-            rigidbody.MovePosition(rigidbody.position + forwardMovement + horizontalMovement);
+            Vector3 newPosition = rigidbody.position + forwardMovement + horizontalMovement;// This is the new position of the player
+
+            // Clamp the X position
+            newPosition.x = Mathf.Clamp(newPosition.x, minX, maxX);
+
+            rigidbody.MovePosition(newPosition);// This will move the player to the new position
         }
         Update(); // Call the Update method to handle input and other updates
     }
@@ -138,20 +182,35 @@ public class PlayerMovement: MonoBehaviour
         }
     }
 
-    public void AddShield(int shieldToAdd)
+    public void AddCoal(int coalToAdd)
     {
-        shield += shieldToAdd; // Add shield to the player's shield
-        if (shield > maxShield) // Ensure shield does not exceed maxShield
+
+        coal += coalToAdd; // Add coal to the player's coal
+        Debug.Log("Coal calld: " + coal); // Log the current coal value
+        if (coal > maxCoal) // Ensure coal does not exceed maxCoal
         {
-            shield = maxShield;
+            Debug.Log("Max Coal: " + maxCoal); // Log the maximum coal value
+            coal = maxCoal;
+        }
+    }
+
+    public void DeductCoal(int coalToDeduct)
+    {
+        coal -= coalToDeduct;
+        Debug.Log("Coal calld: " + coal); // Log the current coal value
+        if (coal < 0) // Ensure coal does not exceed maxCoal
+        {
+            coal = 0;
         }
     }
 
     public void AddTimeOrb(int timeOrbToAdd)
     {
         timeOrb += timeOrbToAdd; // Add time orb to the player's time orb
+        Debug.Log("Time Orb: " + timeOrb); // Log the current time orb value
         if (timeOrb > maxTimeOrb) // Ensure timeOrb does not exceed maxTimeOrb
         {
+            Debug.Log("Max Time Orb: " + maxTimeOrb); // Log the maximum time orb value
             timeOrb = maxTimeOrb;
         }
         StartCoroutine(SlowDownPlayer(timeOrbToAdd)); // Trigger the slowdown effect
@@ -168,9 +227,10 @@ public class PlayerMovement: MonoBehaviour
 
     public void UpdateUI()
     {
+        Debug.Log("UpdateUI called"); // Log when the UI is updated
         deathScore.text = "Score: " + points; // Update the death score text
         scoreText.text = "Score: " + points; // Update the score text
         healthText.text = "Health: " + health; // Update the health text
-        shieldText.text = "Shield: " + shield; // Update the shield text
+        coalText.text = "Coal: " + coal; // Update the coal text}
     }
 }
